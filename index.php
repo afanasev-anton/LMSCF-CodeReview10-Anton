@@ -12,9 +12,6 @@ if (!isset($_SESSION['user'])) {
 
 require_once 'connection.php';
 
-//$_SESSION['list'] = array();	//array with list of media
-
-
 
 ?>
 <!DOCTYPE html>
