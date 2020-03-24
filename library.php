@@ -53,7 +53,7 @@ if ($_GET['itm'] == 'all') {
 
 	        array_push($list,new Media ($value['mdId'],$value['title'],$author,$value['img'],$value['descr'],$value['isbn'],$value['pName'],$value['publish_date'],$value['status'],$value['type']) );
 
-	        $queryMsg = "Details";	        
+	        $queryMsg = "All ".$type."`s";	        
 	    }
 	    $_SESSION['list'] = $list;
 	    $_SESSION['queryMsg'] = $queryMsg;
@@ -121,7 +121,7 @@ if ($_GET['itm'] == 'all') {
     	<div class="row p-3">
     		<h3 class="w-100 text-center text-info"><?php echo $queryMsg; ?></h3>
     		<?php 
-    		if ($_GET['itm'] == 'all') {
+    		if (($_GET['itm'] == 'all') || ($_GET['itm'] == 'book') || ($_GET['itm'] == 'DVD') || ($_GET['itm'] == 'CD')) {
 	    		foreach ($list as $val) {
 	    			$res=$val->printCards();
 	    			echo $res;
