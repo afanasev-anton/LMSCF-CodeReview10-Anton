@@ -43,7 +43,7 @@ require_once 'connection.php';
     	</nav>
 
     	<div class="container mt-5">
-    		<div class="w-100">
+    		<div class="w-100 p-3">
     			<h1 class="text-center text-dark">Big Library</h1>
     			<h3 class="text-secondary">Spend time with benefit</h3>
     			<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Donec pretium vulputate sapien nec sagittis aliquam malesuada bibendum arcu.</p>    			
