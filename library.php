@@ -37,6 +37,32 @@ if ($_GET['itm'] == 'all') {
 	    $_SESSION['queryMsg'] = $queryMsg;
 	}
 
+} elseif ( ($_GET['itm'] == 'book') || ($_GET['itm'] == 'DVD') || ($_GET['itm'] == 'CD') ) {
+	$type = $_GET['itm'];
+	$queryList = mysqli_query($conn, "SELECT media.mdId, media.title, authors.name as aName, authors.surname as aSname, media.img, media.isbn, media.descr, publishers.name as pName, media.publish_date, media.status, media.type
+		FROM media
+		LEFT JOIN author_media ON media.mdId = author_media.mdId
+		LEFT JOIN authors ON author_media.authId = authors.authId
+		LEFT JOIN publishers ON media.publisher = publishers.pubId
+		WHERE media.type='$type'");
+	if($queryList->num_rows > 0){
+	    $rows = $queryList->fetch_all(MYSQLI_ASSOC);
+	    foreach ($rows as $value){
+	        
+	        $author = ''.$value['aName'].' '.$value['aSname'];
+
+	        array_push($list,new Media ($value['mdId'],$value['title'],$author,$value['img'],$value['descr'],$value['isbn'],$value['pName'],$value['publish_date'],$value['status'],$value['type']) );
+
+	        $queryMsg = "Details";	        
+	    }
+	    $_SESSION['list'] = $list;
+	    $_SESSION['queryMsg'] = $queryMsg;
+	} else {
+		$queryMsg = "Sorry, we can not find it...";
+		$_SESSION['list'] = array();
+	    $_SESSION['queryMsg'] = $queryMsg;
+	}
+
 } else {
 	$queryList = mysqli_query($conn, "SELECT media.mdId, media.title, authors.name as aName, authors.surname as aSname, media.img, media.isbn, media.descr, publishers.name as pName, media.publish_date, media.status, media.type
 		FROM media

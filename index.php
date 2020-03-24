@@ -50,17 +50,17 @@ require_once 'connection.php';
     		</div>
     		<div class="row p-3">
     			<div class="col p-3">
-    				<a href="library.php?itm=books" class="btn btn-info btn-lg w-100">
+    				<a href="library.php?itm=book" class="btn btn-info btn-lg w-100">
     					<i class='fas fa-book'></i> Books
     				</a>
     			</div>
     			<div class="col p-3">
-    				<a href="library.php?itm=dvds" class="btn btn-info btn-lg w-100">
+    				<a href="library.php?itm=DVD" class="btn btn-info btn-lg w-100">
     					<i class='fas fa-compact-disc'></i> DVDs
     				</a>
     			</div>
     			<div class="col p-3">
-    				<a href="library.php?itm=cds" class="btn btn-info btn-lg w-100">
+    				<a href="library.php?itm=CD" class="btn btn-info btn-lg w-100">
     					<i class='fas fa-compact-disc'></i> CDs
     				</a>
     			</div>

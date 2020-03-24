@@ -3,7 +3,6 @@ session_start();
 require_once 'connection.php';
 
 $_SESSION['user'] = 'admin';
-//$_SESSION['actMsg'] = '';
 
 if ($_SESSION['user'] == 'admin') {
 	
@@ -103,9 +102,27 @@ if (isset($_POST['btn-add'])) {
 // DELETE item
 if (isset($_GET['delete'])) {
 	$mdId = $_GET['delete'];
-	$sql = "DELETE FROM `author_media` WHERE mdId=".$mdId;
+
+	$sqlAuthId = "SELECT author_media.authId
+		FROM author_media
+		JOIN media on author_media.mdId = media.mdId
+		WHERE media.mdId =".$mdId;
+	$authIds = mysqli_query($conn,$sqlAuthId)->fetch_assoc();
+
+	$sql = "DELETE FROM author_media WHERE mdId=".$mdId;
 	$del = mysqli_query($conn,$sql);
+
 	if ($del) {
+		
+		foreach ($authIds as $x => $val) {
+			echo $x.': '.$val;
+
+			$sql = "DELETE FROM authors WHERE authId=".$val;
+			$del = mysqli_query($conn,$sql);
+			if ($del) {$res = true;} else {$res = false;}
+		}
+
+	
 		$sql = "DELETE FROM media WHERE mdId=".$mdId;
 		$del = mysqli_query($conn,$sql);
 		if ($del) {
@@ -119,8 +136,8 @@ if (isset($_GET['delete'])) {
 			$actMsg = "Something gone wrong: not deleted";
 		}
 	} else {
-		$actMsgTyp = "warning";
-		$actMsg = "Something gone wrong: there is no authors connected with this media";
+		$_SESSION['actMsgTyp'] = "warning";
+		$_SESSION['actMsg'] = "Something gone wrong: there is no authors connected with this media";
 	}
 	
 }
@@ -142,6 +159,7 @@ if (isset($_GET['edit'])) {
 	$editRes = mysqli_query($conn, $editSql);
 	if ($editRes) {
 		$editRow = $editRes-> fetch_assoc();
+		$edMdId = $editRow['mdId'];
 		$edTitle = $editRow['title'];
 		$edAname = $editRow['aName'];
 		$edAsname = $editRow['aSname'];
@@ -170,7 +188,7 @@ if (isset($_POST['btn-upd'])) {
 	if( !$error ) {
 		
 
-		$sqlAuth = "UPDATE authors SET name='$aName', surname='$aSname' WHERE authors.name='$edAname' AND authors.surname='$edAsname'";
+		$sqlAuth = "UPDATE authors SET name='$aName', surname='$aSname' WHERE name='$edAname' AND surname='$edAsname'";
 		$res = mysqli_query($conn, $sqlAuth);
 		if ($res) {
 			$msgTyp = "success";
@@ -181,14 +199,14 @@ if (isset($_POST['btn-upd'])) {
 			unset($aName);
 			unset($aSname);
 			
-			$sqlPubl = "UPDATE publishers SET name='$pName' WHERE publishers.name='$edPname'";
+			$sqlPubl = "UPDATE publishers SET name='$pName' WHERE name='$edPname'";
 			$res = mysqli_query($conn, $sqlPubl);
 
 			if ($res) {
 
 				unset($pName);
 
-				$sqlMedia= "UPDATE `media` SET `title`='$title',`type`='$type' WHERE mdId='$mdId'";
+				$sqlMedia= "UPDATE media SET title='$title', type='$type' WHERE title=".$edTitle;
 				$res = mysqli_query($conn, $sqlMedia);
 
 				if ($res) {
@@ -196,21 +214,21 @@ if (isset($_POST['btn-upd'])) {
 					unset($title);
 					unset($type);
 
-					$_SESSION['actMsg'] = "Media (".$mdId.") have been updated";
+					$_SESSION['actMsg'] = "Media (".$edTitle.") have been updated";
 					$_SESSION['actMsgTyp'] = "success";
 
 					header("Location: manager.php");
 				} else {
 					$_SESSION['actMsgTyp'] = "danger";
-					$_SESSION['actMsg'] = "Something went wrong, try again later...".$mdId;
+					$_SESSION['actMsg'] = "Something went wrong, try again later...".$edTitle;
 				}
 			} else {
 				$_SESSION['actMsgTyp'] = "danger";
-				$_SESSION['actMsg'] = "Something went wrong, try again later...";
+				$_SESSION['actMsg'] = "Something went wrong, try again later... (1)";
 			}
 		} else {
 			$_SESSION['actMsgTyp'] = "danger";
-			$_SESSION['actMsg'] = "Something went wrong, try again later...";
+			$_SESSION['actMsg'] = "Something went wrong, try again later... (2)";
 		}
 	}
 }
@@ -232,8 +250,8 @@ if (isset($_POST['btn-upd'])) {
 		<h2 class="text-center navbar-brand">Manage Library Items</h2>
 		<ul class="navbar-nav w-100">
 			<li class="nav-item mx-auto">
-				<p class="alert alert-<?php echo $actMsgTyp ?><?php if (isset($_SESSION['actMsgTyp'])){echo $_SESSION['actMsgTyp']; } ?>">
-					<?php echo $actMsg ?>
+				<p class="alert alert-<?php if (isset($_SESSION['actMsgTyp'])){echo $_SESSION['actMsgTyp']; } ?>">
+					
 					<?php if (isset($_SESSION['actMsg'])){echo $_SESSION['actMsg']; } ?>
 				</p>
 			</li>
@@ -261,8 +279,9 @@ if (isset($_POST['btn-upd'])) {
 			<?php 
 			while ($row = $result-> fetch_assoc()): 
 			?>
-			<form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+			
 			<tr>
+				<form class="border" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
 				<td>
 					<?php if ($row['mdId'] == $_GET['edit']) {
 						echo "<input type='text' class='form-control ".$classHide."' name='title' value ='$edTitle'>";
@@ -320,8 +339,9 @@ if (isset($_POST['btn-upd'])) {
 						<a href="manager.php?delete=<?php echo $row['mdId']; ?>" class="btn btn-danger">Delete</a>
 					</div>
 				</td>
-			</tr>
 			</form>
+			</tr>
+			
 		<?php endwhile; ?>
 		</table>		
 	</div>
